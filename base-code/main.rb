@@ -1,3 +1,5 @@
+require 'set'
+
 day = "00"
 file_name = "12-#{day}-24/sampleIn.txt"
 # file_name = "12-#{day}-24/input.txt"
