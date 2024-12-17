@@ -206,8 +206,6 @@ def part2(input)
         visited[loc] += 1000
       end
       if loc == goal
-        # puts "path found"
-        bestScore = score
         bestPaths.append(curPath)
       end
 
@@ -237,22 +235,6 @@ def part2(input)
         queue[heuristic].append([nextPath, d, nextScore, nextLoc, (d != dir)])
       end
     end
-
-    # puts "here"
-    
-
-    # start = [11, 3]
-    # memo = {}
-    # sDir = "E"
-
-    # bestScore = part1(input)
-    # bestPaths = getBestPaths(grid, start, sDir, goal, bestScore, 0, Set[start], dirs, memo)#.map { |i| i[0] }
-
-    # puts bestPaths[0].length
-    # for p in bestPaths[0]
-    #   print p
-    #   puts 
-    # end
 
     onPaths = Set[]
     for i in 0...bestPaths.length
