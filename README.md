@@ -3,7 +3,7 @@ My solutions to Advent of Code 2024!
 
 <!-- AOC TILES BEGIN -->
 <h1 align="center">
-  2024 - 38 ⭐ - Ruby
+  2024 - 40 ⭐ - Ruby
 </h1>
 <a href="12-01-24/main.rb">
   <img src=".aoc_tiles/tiles/2024/01.png" width="161px">
@@ -61,5 +61,8 @@ My solutions to Advent of Code 2024!
 </a>
 <a href="12-19-24/main.rb">
   <img src=".aoc_tiles/tiles/2024/19.png" width="161px">
+</a>
+<a href="12-20-24/main.rb">
+  <img src=".aoc_tiles/tiles/2024/20.png" width="161px">
 </a>
 <!-- AOC TILES END -->
