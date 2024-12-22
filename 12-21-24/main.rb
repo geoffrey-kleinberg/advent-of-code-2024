@@ -1,14 +1,10 @@
 require 'set'
 
 day = "21"
+file_name = "12-#{day}-24/sampleIn.txt"
+file_name = "12-#{day}-24/input.txt"
 
-data = [
-  "029A",
-  "980A",
-  "179A",
-  "456A",
-  "379A"
-]
+data = File.read(file_name).split("\n").map { |i| i.rstrip }
 
 def getAllShortest(start, goal, memo, locations)
 
@@ -75,74 +71,38 @@ def getAllShortest(start, goal, memo, locations)
 end
 
 def getBestPaths(toTry, locMap, locs, memo1)
-  nextBP = []
+    nextBP = []
 
-  for path in toTry
+    for path in toTry
 
-    bestPaths = [""]
-    path = "A" + path
-    for c in 0...(path.length - 1)
-        char = path[c]
-        if /\d/.match? char
-            char = char.to_i
-        end
-        nextChar = path[c + 1]
-        if /\d/.match? nextChar
-            nextChar = nextChar.to_i
-        end
+      bestPaths = [""]
+      path = "A" + path
+      for c in 0...(path.length - 1)
+          char = path[c]
+          if /\d/.match? char
+              char = char.to_i
+          end
+          nextChar = path[c + 1]
+          if /\d/.match? nextChar
+              nextChar = nextChar.to_i
+          end
 
-        paths = getAllShortest(locMap[char], locMap[nextChar], memo1, locs.size)
+          paths = getAllShortest(locMap[char], locMap[nextChar], memo1, locs.size)
 
-        newPaths = []
-        for b in bestPaths
-            for p in paths
-                newPaths.append(b + p)
-            end
-        end
-        bestPaths = newPaths
+          newPaths = []
+          for b in bestPaths
+              for p in paths
+                  newPaths.append(b + p)
+              end
+          end
+          bestPaths = newPaths
+      end
+      nextBP += bestPaths
     end
-    nextBP += bestPaths
-  end
 
-  minLen = nextBP.min { |i, j| i.length <=> j.length }.length
-  nextBP.delete_if { |i| i.length != minLen }
-  return nextBP
-end
-
-def getAShortestPath(start, goal, depth, memo, m1, reverseDirections)
-  if memo[[start, goal, depth]]
-    return memo[[start, goal, depth]]
-  end
-  if depth == 1
-    possible = getAllShortest(start, goal, m1, reverseDirections)
-    memo[[start, goal, depth]] = possible[0]
-    return possible[0]
-  end
-
-  options = getAllShortest(start, goal, m1, 11)
-  bestLen = Float::INFINITY
-  bestPath = nil
-  for path in options
-    thisPath = ""
-    path = "A" + path
-    for c in 0...(path.length - 1)
-        char = path[c]
-        if /\d/.match? char
-            char = char.to_i
-        end
-        nextChar = path[c + 1]
-        if /\d/.match? nextChar
-            nextChar = nextChar.to_i
-        end
-        thisPath += getAShortestPath(reverseDirections[char], reverseDirections[nextChar], depth - 1, memo, m1, reverseDirections)
-    end
-    if thisPath.length < bestLen
-      bestPath = thisPath
-    end
-    bestLen = [thisPath.length, bestLen].min
-  end
-  memo[[start, goal, depth]] = bestPath
-  return bestPath
+    minLen = nextBP.min { |i, j| i.length <=> j.length }.length
+    nextBP.delete_if { |i| i.length != minLen }
+    return nextBP
 end
 
 def decoder(start, path, locs)
@@ -167,7 +127,104 @@ def decoder(start, path, locs)
   return message
 end
 
-def main(input, depth)
+
+def part1(input)
+    keypad = {
+        [0, 0] => 7,
+        [0, 1] => 8,
+        [0, 2] => 9,
+        [1, 0] => 4,
+        [1, 1] => 5,
+        [1, 2] => 6,
+        [2, 0] => 1,
+        [2, 1] => 2,
+        [2, 2] => 3,
+        [3, 1] => 0,
+        [3, 2] => "A",
+    }
+
+    reverseKeypad = {}
+    for i in keypad.keys
+      reverseKeypad[keypad[i]] = i
+    end
+
+    keypadSet = keypad.keys.to_set
+
+    directions = {
+        [0, 1] => "^",
+        [0, 2] => "A",
+        [1, 0] => "<",
+        [1, 1] => "v",
+        [1, 2] => ">",
+    }
+
+    reverseDirections = {}
+
+    for i in directions.keys
+      reverseDirections[directions[i]] = i
+    end
+
+    directionSet = directions.keys.to_set
+
+
+    memo1 = {}
+
+    total = 0
+
+    for line in input
+      num = line.to_i
+
+      toTry = [line]
+
+      toTry = getBestPaths(toTry, reverseKeypad, keypadSet, memo1)
+
+      
+      toTry = getBestPaths(toTry, reverseDirections, directionSet, memo1)
+
+      toTry = getBestPaths(toTry, reverseDirections, directionSet, memo1)
+
+      total += toTry[0].length * num
+
+    end
+
+    return total
+end
+
+def getAShortestPath(start, goal, depth, memo, m1, reverseDirections)
+  if memo[[start, goal, depth]]
+    return memo[[start, goal, depth]]
+  end
+  if depth == 1
+    possible = getAllShortest(start, goal, m1, 5)
+    memo[[start, goal, depth]] = possible[0].length
+    return possible[0].length
+  end
+
+  options = getAllShortest(start, goal, m1, 5)
+  bestLen = Float::INFINITY
+  for path in options
+    thisLen = 0
+    path = "A" + path
+    for c in 0...(path.length - 1)
+        char = path[c]
+        if /\d/.match? char
+            char = char.to_i
+        end
+        nextChar = path[c + 1]
+        if /\d/.match? nextChar
+            nextChar = nextChar.to_i
+        end
+        thisLen += getAShortestPath(reverseDirections[char], reverseDirections[nextChar], depth - 1, memo, m1, reverseDirections)
+    end
+
+    bestLen = [thisLen, bestLen].min
+  end
+
+  memo[[start, goal, depth]] = bestLen
+  return bestLen
+end
+
+def part2(input)
     keypad = {
         [0, 0] => 7,
         [0, 1] => 8,
@@ -210,6 +267,8 @@ def main(input, depth)
 
     total = 0
 
+    depth = 25
+
     for line in input
       num = line.to_i
 
@@ -218,9 +277,8 @@ def main(input, depth)
       firstBest = getBestPaths(toTry, reverseKeypad, keypadSet, memo1)
       
       bestLen = Float::INFINITY
-      bestPath = nil
       for path in firstBest
-        thisPath = ""
+        thisLen = 0
         path = "A" + path
         for c in 0...(path.length - 1)
             char = path[c]
@@ -231,25 +289,10 @@ def main(input, depth)
             if /\d/.match? nextChar
                 nextChar = nextChar.to_i
             end
-            thisPath += getAShortestPath(reverseDirections[char], reverseDirections[nextChar], depth, recurseMemo, memo1, reverseDirections)
+            thisLen += getAShortestPath(reverseDirections[char], reverseDirections[nextChar], depth, recurseMemo, memo1, reverseDirections)
         end
-        if thisPath.length < bestLen
-          bestPath = thisPath
-        end
-        bestLen = [thisPath.length, bestLen].min
+        bestLen = [thisLen, bestLen].min
       end
-
-      message = bestPath
-      depth.times {
-        message = decoder([0, 2], message, directions)
-      }
-
-      puts bestLen
-
-      message = decoder([3, 2], message, keypad)
-      puts line == message
-
-      puts
 
       total += bestLen * num
 
@@ -258,4 +301,5 @@ def main(input, depth)
     return total
 end
 
-puts main(data, 3)
+puts part1(data)
+puts part2(data)
