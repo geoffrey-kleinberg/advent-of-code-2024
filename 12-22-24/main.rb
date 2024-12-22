@@ -49,40 +49,29 @@ end
 
 def part2(input)
 
-    deltas = {
-
-    }
-
-    secretNums = {
-
-    }
-
 
     deltaMaxes = {}
 
     iters = 2000
 
     for i in input
-      puts i
       i = i.to_i
       secretNum = i
-      deltas[i] = []
-      secretNums[i] = []
+      deltas = []
       bd = Set[]
       for t in 0...iters
         nextSecret = nextStep(secretNum)
 
-        # if t != iters - 1
-        deltas[i].append((nextSecret % 10) - (secretNum % 10))
-        # end
+        deltas.append((nextSecret % 10) - (secretNum % 10))
         if t >= 3
-          deltSeq = deltas[i][(t-3)..t].join
+          deltSeq = deltas.join
           if bd.add? deltSeq
             if not deltaMaxes[deltSeq]
               deltaMaxes[deltSeq] = 0
             end
             deltaMaxes[deltSeq] += nextSecret % 10
           end
+          deltas.delete_at(0)
         end
 
         secretNum = nextSecret
